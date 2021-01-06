@@ -9,13 +9,20 @@ import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.exceptions.JedisException;
 
 /**
- * The only reason to have this is to be able to compatible with java 1.5 :(
+ * The only reason to have this is to be able to compatible(兼容) with java 1.5 :(
  */
 public final class SafeEncoder {
+
+  /**
+   * 不可实例化
+   */
   private SafeEncoder(){
     throw new InstantiationError( "Must not instantiate this class" );
   }
 
+  /**
+   * [字符串][字符串长度]
+   */
   public static byte[][] encodeMany(final String... strs) {
     byte[][] many = new byte[strs.length][];
     for (int i = 0; i < strs.length; i++) {

@@ -29,34 +29,62 @@ import redis.clients.jedis.params.LPosParams;
  * Common interface for sharded and non-sharded Jedis
  */
 public interface JedisCommands {
+  /**
+   * 为指定key设置值、如果已经存在则覆盖
+   */
   String set(String key, String value);
 
+  // todo
   String set(String key, String value, SetParams params);
 
+  // 获取指定key的value
   String get(String key);
 
+  // 指定key是否存在
   Boolean exists(String key);
 
+  /**
+   * 持久化指定key
+   */
   Long persist(String key);
 
+  /**
+   * 返回key的类型
+   *    none (key不存在)
+   *    string (字符串)
+   *    list (列表)
+   *    set (集合)
+   *    zset (有序集)
+   *    hash (哈希表)
+   */
   String type(String key);
 
+  // https://www.runoob.com/redis/keys-dump.html
+  // 序列化指定的key
   byte[] dump(String key);
 
+  // todo
   String restore(String key, int ttl, byte[] serializedValue);
 
   String restoreReplace(String key, int ttl, byte[] serializedValue);
 
+  // 设置指定key的过期时间、单位 秒
   Long expire(String key, int seconds);
 
+  // 设置指定key的过期时间、单位 毫秒
   Long pexpire(String key, long milliseconds);
 
+  // 设置指定过期时间戳，成功则1、失败则0。单位是秒
+  // todo 如果unixTime早于当前时间呢
   Long expireAt(String key, long unixTime);
 
+  // 同上、单位是毫秒、13位时间戳
   Long pexpireAt(String key, long millisecondsTimestamp);
 
+  // 返回该key存活的 秒 数
   Long ttl(String key);
 
+  // 返回该key存活的 毫秒 数
   Long pttl(String key);
 
   Long touch(String key);
@@ -123,38 +151,93 @@ public interface JedisCommands {
 
   Long rpush(String key, String... string);
 
+
+  /**
+   * https://www.runoob.com/redis/redis-lists.html
+   *
+   * ======================================== list列表 操作 ===================================================
+   */
+
+  // 插入元素
   Long lpush(String key, String... string);
 
+  // 列表长度
   Long llen(String key);
 
+  /**
+   * 获取指定下标的元素、从0开始。-1表示倒数第一个元素。
+   * 前闭后闭、所以[0,0]是取第一个元素。[0,-1]表示获取所有的元素。
+   */
   List<String> lrange(String key, long start, long stop);
 
+  /**
+   * 裁剪元素列表，只保留指定区间的元素
+   */
   String ltrim(String key, long start, long stop);
 
+  // 获取指定索引的元素、从0开始，可为负数
   String lindex(String key, long index);
 
+  // 设置指定下标的值
   String lset(String key, long index, String value);
 
+  /**
+   * 移除key中和value相等的元素。
+   *
+   * @param count
+   *        1. count>0: 从表头开始、移除count个和value相等的元素；
+   *        2. count<0: 从表尾开始、移除|count|个和value相等的元素；
+   *        3. count=0: 移除list中所有和value相等的元素。
+   */
   Long lrem(String key, long count, String value);
 
+  /**
+   * 移除并返回列表的第一个元素、即最先放入的元素。
+   */
   String lpop(String key);
 
+  /**
+   *  移除并返回列表的最后一个元素，即最后放入的元素
+   */
+  String rpop(String key);
+
+  /**
+   * lpos：Available since 6.0.6.
+   *
+   * https://redis.io/commands/lpos
+   */
   Long lpos(String key, String element);
 
   Long lpos(String key, String element, LPosParams params);
 
   List<Long> lpos(String key, String element, LPosParams params, long count);
 
-  String rpop(String key);
 
+
+  /**
+   * https://www.runoob.com/redis/redis-sets.html
+   *
+   * ======================================== set集合 操作 ===================================================
+   */
+
+  // 添加元素
   Long sadd(String key, String... member);
 
+  // 查看集合中所有元素
   Set<String> smembers(String key);
 
+  /**
+   * 如果key不是集合类型、则抛出异常
+   *
+   * 如果元素不存在则忽略；返回移除的元素个数。
+   */
   Long srem(String key, String... member);
 
+  // 随机移除集合中的一个元素并返回
   String spop(String key);
 
+  // 随机移除元素中的多个元素并返回
+  // 如果count > size(key)，则返回集合中所有的元素
   Set<String> spop(String key, long count);
 
   Long scard(String key);
