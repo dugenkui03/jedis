@@ -87,6 +87,7 @@ public interface JedisCommands {
   // 返回该key存活的 毫秒 数
   Long pttl(String key);
 
+  // 返回指定 key 的最后访问时间
   Long touch(String key);
 
   Boolean setbit(String key, long offset, boolean value);
@@ -211,7 +212,6 @@ public interface JedisCommands {
   Long lpos(String key, String element, LPosParams params);
 
   List<Long> lpos(String key, String element, LPosParams params, long count);
-
 
 
   /**
